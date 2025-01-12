@@ -2,6 +2,7 @@ import express from 'express';
 import OpenAI from 'openai';
 import { CohereClientV2 } from 'cohere-ai';
 import path from 'path';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -18,27 +19,32 @@ const cohere = new CohereClientV2({
     token: cohere_api_key,
   });
 
-  
-const currentDir = path.resolve('./');
+const srcDir = path.resolve('./src/');
 
 router.get('/', (req, res, next) => {
-    res.sendFile(path.join(currentDir, 'views', 'shop.html'));
+    res.sendFile(path.join(srcDir, 'views', 'generator.html'));
 });
 
-router.get('/gnrt-ai', (req, res, next) => {
+router.post('/generate-response', (req, res, next) => {
+
+    const { details } = req.body;
+
+    if (!details) {
+        return res.status(400).send('Details specification is required.');
+    }
+
     var response = null;
     try {
         response = processGPTAI();
+        const response = "your input : \n" + details;
+        res.send(response);
     } catch (error) {
         console.error("Error with OpenAI request:", error);
         res.status(500).send("Something went wrong with the OpenAI request.");
-        return "Something went wrong with the OpenAI request.";
     }
-
-    res.send(response);
 });
 
-function processGPTAI() {
+function processGPTAI(details) {
     const messages = [
         {
             role: 'system',
