@@ -1,20 +1,25 @@
 {
   "name": "generativeai",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "description": "",
   "dependencies": {
-    "express": "^4.21.2"
+    "body-parser": "^1.20.3",
+    "cohere-ai": "^7.15.2",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "openai": "^4.78.1"
   },
   "devDependencies": {
+    "nodemon": "^3.1.9",
     "typescript": "^5.7.3"
   }
 }
