@@ -25,7 +25,7 @@ router.get('/', (req, res, next) => {
     res.sendFile(path.join(srcDir, 'views', 'generator.html'));
 });
 
-router.post('/generate-response', (req, res, next) => {
+router.post('/generate-response', async (req, res, next) => {
 
     const { details } = req.body;
 
@@ -35,38 +35,36 @@ router.post('/generate-response', (req, res, next) => {
 
     var response = null;
     try {
-        response = processGPTAI();
-        const response = "your input : \n" + details;
-        res.send(response);
+        response = await processGPTAI(details);
+        // const response = "your input : \n" + details;
+        console.log(response.message.content);
+        res.send(response.message.content[0].text);
     } catch (error) {
         console.error("Error with OpenAI request:", error);
         res.status(500).send("Something went wrong with the OpenAI request.");
     }
 });
 
-function processGPTAI(details) {
+async function processGPTAI(details) {
     const messages = [
         {
             role: 'system',
-            content: 'You are my friend.'
-            // content: 'You are an expert IT instructor and teacher.' + 
-            //         'Your answer should be completed within 100 tokens and contains only 1 or 2 points or topics.'
+            content: 'You are an expert in ServiceNow.' + 
+                    'Your answer should be completed within 100 tokens and should reply in completed response.'
         },
         {
             role: 'user',
-            content: 'Who is Indonesia\'s president on November 2024?'
-            // content: 'Hi, i am a junior backend developer. I have experience in building REST API, database, cache, and kafka.' + 
-            //         'What more should I learn?'
+            content: details
         }
     ];
 
-    // const response = await useOpenAIGPT(messages);
+    // const aiRes = await useOpenAIGPT(messages);
     
-    // const response = await useCohereAI(messages);
+    const aiRes = await useCohereAI(messages);
 
     // await callCohereStream(messages);
 
-    return response?response:"";
+    return aiRes?aiRes:"";
     
 }
 
