@@ -6,6 +6,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const active_ai = false;
+
+const ai_used = 'openai'; // cohere, openai
+
 const router = express.Router();
 
 const openai_api_key = process.env.OPENAI_API_KEY || "OPENAI API Key not found!";
@@ -37,8 +41,24 @@ router.post('/generate-response', async (req, res, next) => {
     try {
         response = await processGPTAI(details);
         // const response = "your input : \n" + details;
-        console.log(response.message.content);
-        res.send(response.message.content[0].text);
+
+        if(active_ai) {
+            switch(ai_used){
+                case "openai":
+                    if (response.choices != null) {
+                        console.log(response.choices[0].message.content);
+                        res.send(response.choices[0].message.content);
+                    }
+                    break;
+                case "cohere":
+                    console.log(response.message.content);
+                    res.send(response.message.content[0].text);
+                    break;
+            }
+        }
+        else {        
+            res.send(response);
+        }
     } catch (error) {
         console.error("Error with OpenAI request:", error);
         res.status(500).send("Something went wrong with the OpenAI request.");
@@ -49,8 +69,11 @@ async function processGPTAI(details) {
     const messages = [
         {
             role: 'system',
-            content: 'You are an expert in ServiceNow.' + 
-                    'Your answer should be completed within 100 tokens and should reply in completed response.'
+            content: 'You are an expert ServiceNow developer.' 
+                    + 'you should reply with the quite simple development steps in ServiceNow, and testcases scenario.' 
+                    + 'Your answer should be completed within 100 tokens and should reply completed response.' 
+                    + 'You should response using business level japanese and use proper non-redundant newline in the response!'
+                    // + 'Dont include unnnecessary newline in your answer!'
         },
         {
             role: 'user',
@@ -58,13 +81,22 @@ async function processGPTAI(details) {
         }
     ];
 
-    // const aiRes = await useOpenAIGPT(messages);
+
+    if (active_ai) {
+        var aiRes;
+        if (ai_used == "cohere") {
+            aiRes = await useCohereAI(messages);
+        } 
+        else if(ai_used == "openai") {
+            aiRes = await useOpenAIGPT(messages);
+        }
     
-    const aiRes = await useCohereAI(messages);
+        // await callCohereStream(messages);
 
-    // await callCohereStream(messages);
-
-    return aiRes?aiRes:"";
+        return aiRes?aiRes:"";
+    } else {
+        return 'inactive';
+    }
     
 }
 
