@@ -6,11 +6,13 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const active_ai = false;
+const active_ai = true;
 
 const ai_used = 'openai'; // cohere, openai
 
 const router = express.Router();
+
+const generated_data_choice = "dev steps"; //dev steps , test cases, dev steps and test cases
 
 const openai_api_key = process.env.OPENAI_API_KEY || "OPENAI API Key not found!";
 const openai = new OpenAI({
@@ -40,6 +42,7 @@ router.post('/generate-response', async (req, res, next) => {
     var response = null;
     try {
         response = await processGPTAI(details);
+        console.log(response);
         // const response = "your input : \n" + details;
 
         if(active_ai) {
@@ -70,14 +73,15 @@ async function processGPTAI(details) {
         {
             role: 'system',
             content: 'You are an expert ServiceNow developer.' 
-                    + 'you should reply with the quite simple development steps in ServiceNow, and testcases scenario.' 
-                    + 'Your answer should be completed within 100 tokens and should reply completed response.' 
-                    + 'You should response using business level japanese and use proper non-redundant newline in the response!'
+                    + 'you should reply with ' + generated_data_choice + " for servicenow." 
+                    + 'You shouldnt include unnecessary sentences/words in the response.'
+                    + 'Your answer should be completed within 300 tokens and should reply completed response.' 
+                    // + 'You should response in CSV-like format which for dev steps (no,step detail) and for testcase (no,test details, test data).'
                     // + 'Dont include unnnecessary newline in your answer!'
         },
         {
             role: 'user',
-            content: details
+            content: "I want to develop " + details
         }
     ];
 
@@ -114,7 +118,7 @@ async function useOpenAIGPT(messages) {
         model: "gpt-4o-mini",
         messages: messages,
         temperature: 1.5,
-        max_tokens: 100
+        max_tokens: 300
     });
 }
 
