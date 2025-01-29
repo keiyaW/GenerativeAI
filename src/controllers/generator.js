@@ -10,15 +10,24 @@ const active_ai = true;
 
 const ai_used = 'openai'; // cohere, openai
 
+const is_deepseek = false;
+
 const router = express.Router();
 
 const generated_data_choice = "dev steps"; //dev steps , test cases, dev steps and test cases
 
 const openai_api_key = process.env.OPENAI_API_KEY || "OPENAI API Key not found!";
-const openai = new OpenAI({
-    apiKey: openai_api_key,  // Pass the API key to the OpenAI instance
-    dangerouslyAllowBrowser: true,
-});
+
+const deepseek_api_key = process.env.DEEPSEEK_API_KEY || "DEEPSEEK API Key not found!";
+
+const openai = is_deepseek ? 
+    new OpenAI({
+        baseURL: 'https://api.deepseek.com',
+        apiKey: '<DeepSeek API Key>'
+    }) : new OpenAI({
+        apiKey: openai_api_key,  // Pass the API key to the OpenAI instance
+        dangerouslyAllowBrowser: true
+    });
 
 const cohere_api_key = process.env.COHERE_API_KEY || "Cohere API Key not found!";
 const cohere = new CohereClientV2({
@@ -41,7 +50,7 @@ router.post('/generate-response', async (req, res, next) => {
 
     var response = null;
     try {
-        response = await processGPTAI(details);
+        response = await processGeneration(details);
         console.log(response);
         // const response = "your input : \n" + details;
 
@@ -68,7 +77,7 @@ router.post('/generate-response', async (req, res, next) => {
     }
 });
 
-async function processGPTAI(details) {
+async function processGeneration(details) {
     const messages = [
         {
             role: 'system',
@@ -92,7 +101,7 @@ async function processGPTAI(details) {
             aiRes = await useCohereAI(messages);
         } 
         else if(ai_used == "openai") {
-            aiRes = await useOpenAIGPT(messages);
+            aiRes = await useOpenAI(messages);
         }
     
         // await callCohereStream(messages);
@@ -113,7 +122,7 @@ async function useCohereAI(messages) {
 }
 
 
-async function useOpenAIGPT(messages) {
+async function useOpenAI(messages) {
     return await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: messages,
