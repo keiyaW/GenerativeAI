@@ -58,14 +58,28 @@
               if (!response.ok) {
                   throw new Error(`Server error: ${response.statusText}. url: ${response.url}`);
               }
-  
-              const result = await response.text(); // Adjust based on your API's response format
-              // Hide the spinner and show the response
+              
+              // Convert response to a blob (binary data)
+              const blob = await response.blob();
+              
+              // Create a download link
+              const downloadUrl = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = downloadUrl;
+              a.download = "generatedTestCases.xlsx"; // File name
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(downloadUrl); // Clean up memory
+              
+              // const result = await response.text(); // Adjust based on your API's response format
+              // // Hide the spinner and show the response
               loadingSpinner.classList.add('d-none');
               responseContainer.classList.remove('d-none');
               responseContainer.classList.remove('alert-danger');
               responseContainer.classList.add('alert-success');
-              responseContainer.innerHTML = result.replace(/\n/g, "<br>");
+              // responseContainer.innerHTML = result.replace(/\n/g, "<br>");
+              responseContainer.innerHTML = "ファイルが正常にダウンロードされました！";              
           } catch (error) {
               // Hide the spinner and show the error message
               loadingSpinner.classList.add('d-none');
