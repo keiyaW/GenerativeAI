@@ -136,24 +136,6 @@ router.post('/generate-response', async (req, res, next) => {
         res.setHeader("Content-Disposition", "attachment; filename=test.xlsx");
     
         res.end(excelFile);
-
-        // if(active_ai) {
-        //     switch(ai_used){
-        //         case "openai":
-        //             if (response.choices != null) {
-        //                 console.log(response.choices[0].message.content);
-        //                 res.send(response.choices[0].message.content);
-        //             }
-        //             break;
-        //         case "cohere":
-        //             console.log(response.message.content);
-        //             res.send(response.message.content[0].text);
-        //             break;
-        //     }
-        // }
-        // else {        
-        //     res.send(response);
-        // }
     } catch (error) {
         console.error("Error with OpenAI request:", error);
         res.status(500).send("Something went wrong with the OpenAI request.");
@@ -165,11 +147,10 @@ async function processGeneration(details) {
         {
             role: 'system',
             content: system_setup
-                    // + 'Dont include unnnecessary newline in your answer!'
         },
         {
             role: 'user',
-            content: "I want to develop in servicenow with requirements: " + details
+            content: "I want to develop in servicenow with requirements: \n" + details
         }
     ];
 
