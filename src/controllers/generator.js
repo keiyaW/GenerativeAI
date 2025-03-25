@@ -29,15 +29,17 @@ const srcDir = path.resolve('./src/');
 const system_setup = 'You are an expert ServiceNow developer.'
     + 'you should reply with test cases scenario for servicenow.'
     + 'You shouldnt include unnecessary sentences/words in the response.'
-    + 'Your answer should be completed within 1000 tokens using business level japanese.'
+    + 'Your answer should be ' 
+    // + 'completed within 1000 tokens ' 
+    + 'using business level japanese.'
     + 'Your answer must not contain newlines or semicolon, and should be a proper complete response!'
     + 'You should response in format (Number;Test Scenario;Steps for testing;Excpected Result) for each test case and separate each case using | character without using any newline.'
-    + 'The test cases should cover all possible scenarios to test, it would be better if some test cases can be combined into one  but dont include the scenario which not mentioned in requirement.'
+    + 'The test cases should cover all possible case scenario to test, it would be better if some test cases can be combined into one  but dont include the scenario which not mentioned in requirement.'
     + 'Example Response format :'
     + 'No:1;Scenario:First Scenario;Steps:-stepone>>-steptwo;Result:First result|No:2;Scenario:Second Scenario;Steps:-stepone>>-steptwo;Result:Second Result'
     + '\nTest Scenario value in each test case scenario should be unique.'
     + 'in steps, use >> without space to separate between step, example: ・stepone>>・steptwo'
-    + '\nLimit the test case to 10.';
+    // + '\nLimit the test case to 10.';
 
 const exportToSpreadsheet = async (data) => {
 
@@ -188,7 +190,7 @@ async function useOpenAI(messages) {
         model: "gpt-4o-mini",
         messages: messages,
         temperature: 0.6,
-        max_tokens: 1000
+        max_tokens: 10000
     });
 }
 
